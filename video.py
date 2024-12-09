@@ -8,9 +8,6 @@ from rich import box
 from yt_dlp import YoutubeDL
 import subprocess
 
-# To print with wrap
-console = Console()
-
 # Download video and audio formats using yt_dlp
 with YoutubeDL({ "quiet": True, "no-warnings": True, "noplaylist": True, "skip_download": True }) as ydl:
     info = ydl.extract_info(URL, download=False)
@@ -63,27 +60,32 @@ with YoutubeDL({ "quiet": True, "no-warnings": True, "noplaylist": True, "skip_d
             i += 1
         return f"{bytes:.2f} {units[i]}"
 
+    def style_error(text):
+        return Text(text, style="bold red")
+
     for index, i in enumerate(video_formats):
-        resolution = res_highlight(i.get("resolution", "None"), i.get("format_note", "None"))
-        filesize = Text(format_filesize(i.get("filesize", 0)), style="dark_green")
+        resolution = res_highlight(str(i.get("resolution", "None")), str(i.get("format_note", "None")))
+        filesize = Text(format_filesize(str(i.get("filesize", 0))), style="dark_green")
         bitrate = Text(str(i.get("vbr", "None")), style="dodger_blue2")
         fps = Text(str(i.get("fps", "none")), style="bright_black")
-        ext = Text(i.get("ext", "none"), style="bright_black")
-        codec = Text(i.get("vcodec", "none"), style="bright_black")
+        ext = Text(str(i.get("ext", "none")), style="bright_black")
+        codec = Text(str(i.get("vcodec", "none")), style="bright_black")
 
         video_table.add_row(str(index+1), resolution, filesize, bitrate, fps, ext, codec)
     
     for index, i in enumerate(audio_formats):
-        quality = Text(i.get("format_note", "None"), style="deep_pink2")
-        filesize = Text(format_filesize(i.get("filesize", 0)), style="dark_green")
+        quality = Text(str(i.get("format_note", "None")), style="deep_pink2")
+        filesize = Text(format_filesize(str(i.get("filesize", 0))), style="dark_green")
         bitrate = Text(str(i.get("abr", "None")), style="bright_blue")
-        ext = Text(i.get("ext", "none"), style="bright_black")
-        codec = Text(i.get("acodec", "none"), style="bright_black")
+        ext = Text(str(i.get("ext", "none")), style="bright_black")
+        codec = Text(str(i.get("acodec", "none")), style="bright_black")
 
         audio_table.add_row(str(index+1), quality, filesize, bitrate, ext, codec)
 
     print("")
 
+    # To print with wrap
+    console = Console()
     console.print(video_table, audio_table)
 
     while True:
@@ -101,15 +103,22 @@ with YoutubeDL({ "quiet": True, "no-warnings": True, "noplaylist": True, "skip_d
             print("Please enter correct character.")
             exit()
 
-        place_val = int(stream_number[1:])-1
+        try:
+            place_val = int(stream_number[1:])-1
+        except:
+            console.print(style_error("Invalid input."))
+            continue
 
-        if stream_number.lower().startswith("a"):
-            url = audio_formats[place_val]["url"]
-            process = subprocess.Popen(['clip'], stdin=subprocess.PIPE, close_fds=True)
-            process.communicate(input=url.encode('utf-8'))
-        else:
-            url = video_formats[place_val]["url"]
-            process = subprocess.Popen(['clip'], stdin=subprocess.PIPE, close_fds=True)
-            process.communicate(input=url.encode('utf-8'))
+        try:
+            if stream_number.lower().startswith("a"):
+                url = audio_formats[place_val]["url"]
+                process = subprocess.Popen(['clip'], stdin=subprocess.PIPE, close_fds=True)
+                process.communicate(input=url.encode('utf-8'))
+            else:
+                url = video_formats[place_val]["url"]
+                process = subprocess.Popen(['clip'], stdin=subprocess.PIPE, close_fds=True)
+                process.communicate(input=url.encode('utf-8'))
 
-        print("Stream copied to clipboard!")
+            print("Stream copied to clipboard!")
+        except Exception as e:
+            console.print(style_error(f"Error: {e}"))

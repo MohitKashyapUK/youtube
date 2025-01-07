@@ -1,11 +1,18 @@
 import os
 import subprocess
-import pyperclip
 from urllib.parse import parse_qs, urlparse
+
+try:
+    import pyperclip
+except: pass
 
 def main():
     # Get URL from clipboard
-    url = pyperclip.paste().strip()
+    url = None
+    try:
+        url = pyperclip.paste().strip()
+    except:
+        url = input("Enter URL: ")
     if not url:
         print("[Error] Clipboard is empty. Please copy a valid YouTube video or playlist URL.")
         return

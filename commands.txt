@@ -1,0 +1,12 @@
+# List video formats
+yt-dlp --skip-download --list-formats --quiet --no-warnings <video_url>
+
+# Download video
+# "+bestaudio" for audio
+# 1080 for 1080p resolution, other resolutions are 720, 480, 360, 240, 144
+yt-dlp -f "bv[height<=1080]+bestaudio" --print filename -o "%(title)s.%(ext)s" --progress --console-title --no-part --quiet --no-warnings <video_url>
+
+yt-dlp -f "bv[height<=1080]+bestaudio/best" -o "%(playlist_title)s/%(playlist_index)s - %(title)s.%(ext)s" --cookies cookies.txt --console-title --no-part --quiet --progress --no-warnings <playlist_url>
+
+# To download YouTube playlist
+yt-dlp -f "bv[height<=720]+bestaudio/best" -o "%(playlist_title)s/%(title)s.%(ext)s" PLAYLIST_URL

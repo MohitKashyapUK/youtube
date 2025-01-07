@@ -9,7 +9,7 @@ from yt_dlp import YoutubeDL
 import subprocess
 
 # Download video and audio formats using yt_dlp
-with YoutubeDL({ "quiet": True, "no-warnings": True, "noplaylist": True, "skip_download": True }) as ydl:
+with YoutubeDL({ "quiet": True, "no-warnings": True, "noplaylist": True, "skip_download": True, "cookiefile": "cookies.txt" }) as ydl:
     info = ydl.extract_info(URL, download=False)
     streams = info["formats"]
     video_formats = []

@@ -18,7 +18,7 @@ if "%start_video%"=="" set start_video=1
 :: Run yt-dlp with user-specified resolution and starting point using modern options
 set optional_params=--playlist-items %start_video%- --cookies cookies.txt --no-part --quiet --progress --no-warnings --console-title
 set output_template=-o "%destination%/%%(playlist_title)s/%%(playlist_index)s - %%(title)s.%%(ext)s"
-set format=-f "bv[height<=%resolution%]+bestaudio/best"
+set format=-f "bv[height<=%resolution%]+bestaudio"
 yt-dlp %format% %optional_params% %output_template% %playlist_url%
 
 pause

@@ -9,12 +9,15 @@ except: pass
 def main():
     # Get URL from clipboard
     url = None
+
     try:
         url = pyperclip.paste().strip()
     except:
         url = input("Enter URL: ")
+
     if not url:
         print("[Error] Clipboard is empty. Please copy a valid YouTube video or playlist URL.")
+        # url = input("Enter URL: ")
         return
 
     # print(f"URL: {url}")
@@ -40,15 +43,16 @@ def download_playlist(url):
 
     command = [
         "yt-dlp",
-        f"-f bv[height<={resolution}]+bestaudio/best",
+        f"-f bv[height<={resolution}][fps=60][vext=mp4]+bestaudio/best",
         "--playlist-items", f"{start_video}-",
         "--cookies", "cookies.txt",
+        "--format-sort", "fps,filesize",
         "--no-part",
         "--quiet",
         "--progress",
         "--no-warnings",
         "--console-title",
-        "--exec", "before_dl:echo 'Downloading: %(playlist_index)s'",
+        "--exec", "before_dl:echo 'Downloading: %(playlist_index)s, FPS: %(fps)s, EXT: %(ext)s'",
         "-o", f"{destination}/%(playlist_title)s/%(playlist_index)s - %(title)s.%(ext)s",
         url
     ]
@@ -74,8 +78,10 @@ def download_video(url):
     list_formats_command = ["yt-dlp", "--list-formats"] + common_params + [url]
     run_command(list_formats_command, "fetch formats")
 
+    print("\nExamples('bv[height=720+bestaudio', '<id>+bestaudio', 'bv+ba/best)")
+
     format_code = input("Enter the format code (e.g., video_id+audio_id): ").strip()
-    command = ["yt-dlp", "-f", format_code] + common_params + download_params + [url]
+    command = ["yt-dlp", "-f", f"(mp4, mp3){format_code}"] + common_params + download_params + [url]
 
     run_command(command, "video")
 
